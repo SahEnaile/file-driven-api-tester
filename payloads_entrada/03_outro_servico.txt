@@ -1,0 +1,7 @@
+POST https://jsonplaceholder.typicode.com/posts
+
+{
+    "title": "foo",
+    "body": "bar",
+    "userId": 1
+}

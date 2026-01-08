@@ -24,29 +24,36 @@ def run_txt_tests():
     with open(caminho_entrada, "r", encoding="utf-8") as f:
       conteudo_bruto = f.read().strip()
 
+    if not conteudo_bruto:
+      print(f"[AVISO] {arquivo} está vazio. Ignorando.")
+      continue
+
     conteudo_bruto = conteudo_bruto.replace("\r\n", "\n")
 
     partes_arquivo = conteudo_bruto.split("\n", 1)
-    if len(partes_arquivo) < 2:
-      print(f"[AVISO] {arquivo} não está no formato 'METODO URL'. Ignorando.")
-      continue
-
     cabecalho_requisicao = partes_arquivo[0].strip()
-    payload_conteudo = partes_arquivo[1].strip()
+    payload_conteudo = (
+        partes_arquivo[1].strip() if len(partes_arquivo) >  1 else ""
+    )
 
     try:
       partes_cabecalho = cabecalho_requisicao.split(" ", 1)
       metodo = partes_cabecalho[0].upper()
       url = partes_cabecalho[1].strip()
     except IndexError:
-      print(f"[AVISO] Cabeçalho inválido em {arquivo}. Ignorando.")
+      print(
+          f"[AVISO] {arquivo} com cabeçalho inválido (use: METODO URL)."
+          " Ignorando."
+      )
       continue
 
-    try:
-      payload_json = json.loads(payload_conteudo) if payload_conteudo else None
-    except json.JSONDecodeError:
-      print(f"[AVISO] O payload em {arquivo} não é um JSON válido. Ignorando.")
-      continue
+    payload_json = None
+    if payload_conteudo:
+      try:
+        payload_json = json.loads(payload_conteudo)
+      except json.JSONDecodeError:
+        print(f"[AVISO] O payload em {arquivo} não é um JSON válido. Ignorando.")
+        continue
 
     print(f"Testando -> [{metodo}] {url} (Origem: {arquivo})")
 
@@ -60,7 +67,7 @@ def run_txt_tests():
       elif metodo == "DELETE":
         resp = requests.delete(url, headers=headers, timeout=5)
       else:
-        print(f"[AVISO] Método HTTP '{metodo}' não suportado.")
+        print(f"[AVISO] Método HTTP '{metodo}' não suportado em {arquivo}.")
         continue
 
       resultado_texto = f"""=== RESULTADO DO TESTE DE CONTRATO ===
@@ -70,7 +77,7 @@ URL Testada: {url}
 Status HTTP Retornado: {resp.status_code}
 
 === PAYLOAD ENVIADO ===
-{payload_conteudo}
+{payload_conteudo if payload_conteudo else "(Nenhum payload enviado)"}
 
 === RESPOSTA DA API ===
 {resp.text}

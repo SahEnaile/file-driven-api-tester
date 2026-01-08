@@ -1,0 +1,20 @@
+=== RESULTADO DO TESTE DE CONTRATO ===
+Arquivo de Origem: 03_outro_servico.txt
+Método HTTP: POST
+URL Testada: https://jsonplaceholder.typicode.com/posts
+Status HTTP Retornado: 201
+
+=== PAYLOAD ENVIADO ===
+{
+    "title": "foo",
+    "body": "bar",
+    "userId": 1
+}
+
+=== RESPOSTA DA API ===
+{
+  "title": "foo",
+  "body": "bar",
+  "userId": 1,
+  "id": 101
+}
