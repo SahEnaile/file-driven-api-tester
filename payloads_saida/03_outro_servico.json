@@ -1,0 +1,18 @@
+{
+    "status": "SUCCESSO",
+    "arquivo_origem": "03_outro_servico.txt",
+    "metodo_http": "POST",
+    "url_testada": "https://jsonplaceholder.typicode.com/posts",
+    "status_http_retornado": 201,
+    "payload_enviado": {
+        "title": "foo",
+        "body": "bar",
+        "userId": 1
+    },
+    "resposta_api": {
+        "title": "foo",
+        "body": "bar",
+        "userId": 1,
+        "id": 101
+    }
+}

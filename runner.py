@@ -23,7 +23,7 @@ def run_txt_tests():
 
   for arquivo in arquivos:
     caminho_entrada = os.path.join(INPUT_DIR, arquivo)
-    nome_saida = arquivo.replace(".txt", "_resposta.txt")
+    nome_saida = arquivo.replace(".txt", ".json")
 
     caminho_sucesso = os.path.join(SUCCESS_DIR, nome_saida)
     caminho_erro = os.path.join(ERROR_DIR, nome_saida)
@@ -41,7 +41,6 @@ def run_txt_tests():
       continue
 
     conteudo_bruto = conteudo_bruto.replace("\r\n", "\n")
-
     partes_arquivo = conteudo_bruto.split("\n", 1)
     cabecalho_requisicao = partes_arquivo[0].strip()
     payload_conteudo = (
@@ -73,7 +72,7 @@ def run_txt_tests():
             caminho_erro,
             caminho_sucesso,
             arquivo,
-            f"O payload enviado não é um JSON válido.\nDetalhe: {str(err)}",
+            f"O payload enviado não é um JSON válido. Detalhe: {str(err)}",
         )
         continue
 
@@ -97,33 +96,39 @@ def run_txt_tests():
         )
         continue
 
-      resultado_texto = f"""=== RESULTADO DO TESTE DE CONTRATO ===
-Arquivo de Origem: {arquivo}
-Método HTTP: {metodo}
-URL Testada: {url}
-Status HTTP Retornado: {resp.status_code}
+      # Tenta converter a resposta da API para JSON se possível, senão guarda como texto puro
+      try:
+        resposta_api_obj = resp.json()
+      except ValueError:
+        resposta_api_obj = resp.text
 
-=== PAYLOAD ENVIADO ===
-{payload_conteudo if payload_conteudo else "(Nenhum payload enviado)"}
+      dados_sucesso = {
+          "status": "SUCCESSO",
+          "arquivo_origem": arquivo,
+          "metodo_http": metodo,
+          "url_testada": url,
+          "status_http_retornado": resp.status_code,
+          "payload_enviado": payload_json if payload_json else None,
+          "resposta_api": resposta_api_obj,
+      }
 
-=== RESPOSTA DA API ===
-{resp.text}
-"""
       with open(caminho_sucesso, "w", encoding="utf-8") as f_out:
-        f_out.write(resultado_texto)
+        json.dump(dados_sucesso, f_out, indent=4, ensure_ascii=False)
 
       if os.path.exists(caminho_erro):
         os.remove(caminho_erro)
         print(f"[LIMPEZA] {arquivo} corrigido! Removido da pasta de erros.")
 
     except requests.RequestException as err:
-      resultado_erro = f"""=== ERRO NA REQUISIÇÃO ===
-Arquivo de Origem: {arquivo}
-URL Testada: {url}
-Erro de Conexão: {str(err)}
-"""
+      dados_erro = {
+          "status": "ERRO_REQUISICAO",
+          "arquivo_origem": arquivo,
+          "url_testada": url,
+          "erro_conexao": str(err),
+      }
+
       with open(caminho_erro, "w", encoding="utf-8") as f_err:
-        f_err.write(resultado_erro)
+        json.dump(dados_erro, f_err, indent=4, ensure_ascii=False)
 
       if os.path.exists(caminho_sucesso):
         os.remove(caminho_sucesso)
@@ -138,12 +143,13 @@ Erro de Conexão: {str(err)}
 
 def registrar_erro(caminho_erro, caminho_sucesso, arquivo, mensagem):
   print(f"[AVISO] {arquivo}: {mensagem}")
-  conteudo = f"""=== ERRO DE VALIDAÇÃO DO CONTRATO ===
-Arquivo de Origem: {arquivo}
-Motivo: {mensagem}
-"""
+  dados_erro = {
+      "status": "ERRO_VALIDACAO",
+      "arquivo_origem": arquivo,
+      "motivo": mensagem,
+  }
   with open(caminho_erro, "w", encoding="utf-8") as f:
-    f.write(conteudo)
+    json.dump(dados_erro, f, indent=4, ensure_ascii=False)
 
   if os.path.exists(caminho_sucesso):
     os.remove(caminho_sucesso)

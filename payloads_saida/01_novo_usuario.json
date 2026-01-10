@@ -1,0 +1,30 @@
+{
+    "status": "SUCCESSO",
+    "arquivo_origem": "01_novo_usuario.txt",
+    "metodo_http": "POST",
+    "url_testada": "https://reqres.in/api/users",
+    "status_http_retornado": 201,
+    "payload_enviado": {
+        "name": "Sarah",
+        "job": "Software Engineer"
+    },
+    "resposta_api": {
+        "name": "Sarah",
+        "job": "Software Engineer",
+        "id": "342",
+        "createdAt": "2026-09-07T00:38:36.281Z",
+        "_meta": {
+            "powered_by": "ReqRes",
+            "docs_url": "https://app.reqres.in/documentation",
+            "upgrade_url": "https://app.reqres.in/upgrade",
+            "example_url": "https://app.reqres.in/examples/notes-app",
+            "variant": "v1_b",
+            "message": "This is a read-only demo endpoint. Sign up to create your own collections with full CRUD and auth.",
+            "cta": {
+                "label": "Get started",
+                "url": "https://app.reqres.in/upgrade"
+            },
+            "context": "legacy_success"
+        }
+    }
+}
