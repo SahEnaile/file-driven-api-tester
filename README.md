@@ -3051,5 +3051,3 @@ Crie arquivos `.txt` dentro da pasta `payloads_entrada/` seguindo estes padrões
    ```bash
    docker run --rm -v $(pwd)/payloads_entrada:/app/payloads_entrada -v $(pwd)/payloads_saida:/app/payloads_saida -v $(pwd)/payloads_erros:/app/payloads_erros api-txt-tester
    ```
-README.md
-Exibindo README.md.
